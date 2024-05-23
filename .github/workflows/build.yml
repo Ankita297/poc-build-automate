@@ -29,8 +29,10 @@ jobs:
           build-tools: 30.0.3
 
       - name: Build Android app
-        run: ./gradlew assembleRelease
-
+        run: |
+          cd android
+          ./gradlew assembleDebug
+          
       - name: Upload APK
         uses: actions/upload-artifact@v2
         with:
