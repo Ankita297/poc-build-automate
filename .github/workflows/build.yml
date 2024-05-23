@@ -1,0 +1,94 @@
+name: Build Different Schemes
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+
+      - name: Build Android app
+        run: ./gradlew assembleRelease
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-apk
+          path: app/build/outputs/apk/release/*.apk
+
+  build-ios-development:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '12.4'
+
+      - name: Install dependencies
+        run: bundle install && bundle exec pod install
+
+      - name: Build iOS Development scheme
+        run: xcodebuild -workspace YourApp.xcworkspace -scheme Development -sdk iphoneos -configuration Release -archivePath $PWD/build/Development.xcarchive archive
+
+      - name: Export IPA for Development
+        run: xcodebuild -exportArchive -archivePath $PWD/build/Development.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath $PWD/build/Development
+
+      - name: Upload IPA Development
+        uses: actions/upload-artifact@v2
+        with:
+          name: ios-ipa-development
+          path: build/Development/*.ipa
+
+  build-ios-production:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '12.4'
+
+      - name: Install dependencies
+        run: bundle install && bundle exec pod install
+
+      - name: Build iOS Production scheme
+        run: xcodebuild -workspace YourApp.xcworkspace -scheme Production -sdk iphoneos -configuration Release -archivePath $PWD/build/Production.xcarchive archive
+
+      - name: Export IPA for Production
+        run: xcodebuild -exportArchive -archivePath $PWD/build/Production.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath $PWD/build/Production
+
+      - name: Upload IPA Production
+        uses: actions/upload-artifact@v2
+        with:
+          name: ios-ipa-production
+          path: build/Production/*.ipa
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [build-android, build-ios-development, build-ios-production]
+    steps:
+      - name: Notify via Slack
+        uses: slackapi/slack-github-action@v1.18.0
+        with:
+          slack-message: "New build is available!"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
