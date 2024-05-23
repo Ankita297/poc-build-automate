@@ -28,10 +28,7 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: |
-          cd android
-          npm install
-          cd ..
+        run: npm install
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
@@ -39,14 +36,16 @@ jobs:
           api-level: 30
           build-tools: 30.0.3
 
-      - name: Build Android app
+      - name: Bundle and Build Android app
         run: |
+          npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/
           cd android
-          ./gradlew assembleDebug
+          ./gradlew clean
+          ./gradlew bundleDebugStaging
           cd ..
 
-      - name: Upload APK
+      - name: Upload AAB
         uses: actions/upload-artifact@v2
         with:
-          name: android-apk
-          path: android/app/build/outputs/apk/debug/*.apk
+          name: android-aab
+          path: android/app/build/outputs/bundle/debug/*.aab
