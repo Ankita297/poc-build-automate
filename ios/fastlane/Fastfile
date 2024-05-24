@@ -14,15 +14,11 @@
 # update_fastlane
 
 platform :ios do
-  desc "Build and archive iOS app"
-  lane :build do
-    increment_build_number
-    build_app(
-      scheme: "YourAppScheme",
-      workspace: "YourApp.xcworkspace",
-      configuration: "Release",
-      output_directory: "build",
-      output_name: "YourApp.ipa"
-    )
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    increment_build_number(xcodeproj: "XhubTemplate.xcodeproj")
+    build_app(workspace: "XhubTemplate.xcworkspace", scheme: "XhubTemplate")
+    commit_version_bump(message: 'bump build')
+    push_to_git_remote
   end
 end
