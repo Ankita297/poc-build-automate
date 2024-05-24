@@ -19,7 +19,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.7'
+          ruby-version: '3.1.0'
 
       - name: Install Bundler
         run: gem install bundler -v 2.3.26
@@ -48,9 +48,7 @@ jobs:
       - name: Build and Archive iOS app
         run: |
           cd ios
- 
-          bundle exec fastlane init
-          bundle exec fastlane build --verbose
+           bundle exec fastlane build --verbose
 
       - name: Upload IPA
         uses: actions/upload-artifact@v2
