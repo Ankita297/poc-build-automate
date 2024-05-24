@@ -47,8 +47,8 @@ jobs:
           ./gradlew assembleDebug
           cd ..
 
-      - name: Upload AAB
+      - name: Upload APK
         uses: actions/upload-artifact@v2
         with:
-          name: android-aab
-          path: android/app/build/outputs/bundle/debug/*.aab
+          name: android-apk
+          path: android/app/build/outputs/apk/debug/*.apk
