@@ -1,0 +1,57 @@
+name: iOS Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7'
+
+      - name: Install Fastlane
+        run: gem install fastlane -NV
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          pod install
+          cd ..
+
+      - name: Create assets directory
+        run: mkdir -p ios/assets
+
+      - name: Bundle React Native
+        run: |
+          npx react-native bundle --platform ios --dev false --entry-file index.js --bundle-output ios/main.jsbundle --assets-dest ios/assets/
+
+      - name: Build and Archive iOS app
+        run: |
+          cd ios
+          bundle exec fastlane ios build --verbose
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v2
+        with:
+          name: ios-ipa
+          path: ios/build/*.ipa
