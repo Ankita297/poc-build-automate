@@ -24,11 +24,6 @@ jobs:
       - name: Install Bundler
         run: gem install bundler -v 2.3.26
 
-      - name: Install CocoaPods and Fastlane
-        run: |
-          gem install cocoapods -v 1.14.0
-          gem install fastlane -NV
-
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
@@ -40,6 +35,7 @@ jobs:
       - name: Install CocoaPods dependencies
         run: |
           cd ios
+          bundle install
           pod install
 
       - name: Create assets directory
@@ -52,7 +48,8 @@ jobs:
       - name: Build and Archive iOS app
         run: |
           cd ios
-          bundle install
+ 
+          bundle exec fastlane init
           bundle exec fastlane build --verbose
 
       - name: Upload IPA
