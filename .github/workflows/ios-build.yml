@@ -19,10 +19,13 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.1.0'
+          ruby-version: '2.7'
 
-      - name: Install Fastlane
-        run: gem install fastlane -NV
+      - name: Install Bundler
+        run: gem install bundler -v 2.3.26
+
+      - name: Install CocoaPods
+        run: gem install cocoapods -v 1.14.0
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
@@ -32,11 +35,10 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install CocoaPods
+      - name: Install CocoaPods dependencies
         run: |
           cd ios
           pod install
-          cd ..
 
       - name: Create assets directory
         run: mkdir -p ios/assets
@@ -48,7 +50,7 @@ jobs:
       - name: Build and Archive iOS app
         run: |
           cd ios
-          bundle exec fastlane ios build --verbose
+          bundle exec fastlane build --verbose
 
       - name: Upload IPA
         uses: actions/upload-artifact@v2
