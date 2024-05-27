@@ -1,7 +1,7 @@
 name: "Build Android app"
 
 on:
-workflow_dispatch:
+ workflow_dispatch:
     # can add push and pull_request here 
 
 jobs:
