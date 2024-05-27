@@ -26,11 +26,11 @@ jobs:
         with:
           node-version: '16'
 
-      - name: Run Yarn Install
+      - name: Run Npm Install
         run: |
              cd ./packages/app-mobile/
              npm i -g corepack
-             yarn install
+             npm install
              
       # Debug build steps
       - name: Build application (Debug)
